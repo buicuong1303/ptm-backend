@@ -1,0 +1,66 @@
+PORT=3000
+HOST=http://localhost:4100
+# Prefix path
+PREFIX_PATH=/api
+
+# postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=php_text_message
+POSTGRES_HOST=php_text_message-database
+POSTGRES_PORT=5432
+PG_DATA=/var/lib/postgresql/data
+
+# mail
+MAIL_USR=phpswteam@gmail.com
+MAIL_PWD=phps0ftwareteam!
+MAIL_FROM=phpswteam@gmail.com
+
+# redis-queue
+RDQ_HOST=php_text_message-redis-queue
+RDQ_PORT=6379
+RDQ_PASSWD=redis
+
+# redis-cache
+RDC_HOST=php_text_message-redis-cache
+RDC_PASSWD=redis
+RDC_PORT=6379
+
+# rabbitmq
+RABBITMQ_ERLANG_COOKIE=erlang_cookie_secret
+RABBITMQ_DEFAULT_VHOST=/
+RABBITMQ_DEFAULT_USER=rabbitmq
+RABBITMQ_DEFAULT_PASS=rabbitmq
+RABBITMQ_HOST=php_text_message-rabbitmq
+RABBITMQ_PORT=5672
+
+# elasticsearch
+ES_HOST=http://php_text_message-es
+ES_PORT=9200
+ES_REQUEST_TIMEOUT=120000
+
+# kibana
+ELASTICSEARCH_USERNAME=kibana
+ELASTICSEARCH_PASSWORD=kibana
+ELASTICSEARCH_URL=http://php_text_message-es:9200 # master node url
+ELASTICSEARCH_HOSTS='["http://php_text_message-es:9200"]' # all host of node in cluster
+
+# jwt
+JWT_SECRET=phpswteam
+JWT_EXPIRES_IN=1d
+JWT_EXPIRES_RESET_PASSWORD_IN=10m
+
+# aws-s3
+AWS_S3_ACCESS_ID=AKIAZM4V7ZVPVMJAGKTL
+AWS_S3_SECRET_ID=Q+M8MJ2UaurB90H0SnXityu/a0RFyydi4OyBz4bu
+AWS_S3_REGION=ap-southeast-1
+AWS_S3_BKN=phptextmessage
+AWS_S3_PATH_MESSAGE_ATTACHMENT=public/msg-attachment
+AWS_S3_PATH_AVATAR=public/avatar
+AWS_S3_PATH_SCHEDULE_MESSAGE=public/schedule-message
+
+# environment
+NODE_OPTIONS=--max_old_space_size=2048
+
+# threshold sensitive
+SENSITIVE_THRESHOLD=0.6

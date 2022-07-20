@@ -1,0 +1,99 @@
+variables:
+  PROJECT: $CI_PROJECT_NAME
+  BRANCH: $CI_COMMIT_REF_NAME
+
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+  IMAGE_TAG: $CI_COMMIT_SHA
+  
+  USERNAME: $GITLAB_USERNAME
+  PASSWORD: $GITLAB_PASSWORD
+
+  REGISTRY: $CI_REGISTRY
+  REPOSITORY: $CI_PROJECT_URL
+
+  TAG_NAME: $CI_COMMIT_REF_NAME
+stages:
+  - build
+
+build_development:
+  stage: build
+
+  before_script:
+    - docker info
+    - docker login -u $USERNAME -p $PASSWORD $REGISTRY
+
+  script:
+    # clean before image
+    - echo "Start clean cache image..."
+    - docker image prune --force
+    - docker images -a | grep "${IMAGE_NAME}" | awk '{print $3}' | xargs docker rmi --force || true
+    - echo "Clean cache image successfully!"
+
+    - echo "Start building Backend..."
+    - docker pull "${IMAGE_NAME}/backend":latest || true
+    - docker build . --target production --cache-from "${IMAGE_NAME}/backend":latest --tag "${IMAGE_NAME}/backend":${TAG_NAME}
+    - docker push "${IMAGE_NAME}/backend":${TAG_NAME}
+    - echo "Build Backend successfully!"
+  tags:
+     - build-runner
+  when: manual
+  only:
+    - develop
+
+build_staging:
+  stage: build
+
+  before_script:
+    - docker info
+    - docker login -u $USERNAME -p $PASSWORD $REGISTRY
+
+  script:
+    # clean before image
+    - echo "Start clean cache image..."
+    - docker image prune --force
+    - docker images -a | grep "${IMAGE_NAME}" | awk '{print $3}' | xargs docker rmi --force || true
+    - echo "Clean cache image successfully!"
+
+    - echo "Start building Backend..."
+    - docker pull "${IMAGE_NAME}/backend":latest || true
+    - docker build . --target production --cache-from "${IMAGE_NAME}/backend":latest --tag "${IMAGE_NAME}/backend":${TAG_NAME}
+    - docker push "${IMAGE_NAME}/backend":${TAG_NAME}
+    - echo "Build Backend successfully!"
+  tags:
+     - build-runner
+  when: manual
+  only:
+    - staging
+
+build_production:
+  stage: build
+
+  before_script:
+    - docker info
+    - docker login -u $USERNAME -p $PASSWORD $REGISTRY
+
+  script:
+    # clean before image
+    - echo "Start clean cache image..."
+    - docker image prune --force
+    - docker images -a | grep "${IMAGE_NAME}" | awk '{print $3}' | xargs docker rmi --force || true
+    - echo "Clean cache image successfully!"
+
+    - echo "Start building Backend..."
+    - docker pull "${IMAGE_NAME}/backend":latest || true
+    - docker build . --target production --cache-from "${IMAGE_NAME}/backend":latest --tag "${IMAGE_NAME}/backend":${TAG_NAME} --tag "${IMAGE_NAME}/backend":latest
+    - docker push "${IMAGE_NAME}/backend":${TAG_NAME}
+    - docker push "${IMAGE_NAME}/backend":latest
+    - echo "Build Backend successfully!"
+
+    # - echo "Start building Elasticsearch..."
+    # - docker pull "${IMAGE_NAME}/elasticsearch":latest || true
+    # - docker build --target elasticsearch --cache-from "${IMAGE_NAME}/elasticsearch":latest --tag "${IMAGE_NAME}/elasticsearch":${IMAGE_TAG} --tag "${IMAGE_NAME}/elasticsearch":latest .
+    # - docker push "${IMAGE_NAME}/elasticsearch":${IMAGE_TAG}
+    # - docker push "${IMAGE_NAME}/elasticsearch":latest
+    # - echo "Build Elasticsearch successfully!"
+  tags:
+     - build-runner
+  when: manual
+  only:
+    - tags

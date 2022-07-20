@@ -1,0 +1,70 @@
+version: '3.7'
+
+services:
+  php_text_message-backend:
+    container_name: php_text_message-backend
+    image: php_text_message-backend
+    build:
+      context: ./ #where Dockerfile to build
+      target: development
+    volumes:
+      - ./:/usr/src/app
+    ports:
+      - 3100:3000
+      - 9300:9229
+    # command: yarn run start
+    # command: yarn run start:dev
+    command: yarn run start:debug
+    env_file: 
+      - .env
+
+  php_text_message-database:
+    ports:
+      - 5500:5432
+    env_file:
+      - .env
+
+  php_text_message-redis-queue:
+    ports:
+      - 6500:6379
+    command: redis-server --requirepass redis --appendonly yes # set password
+  
+  php_text_message-rabbitmq:
+    ports:
+      - 5672:5672
+      - 15672:15672
+    env_file: 
+      - .env
+  
+  php_text_message-es:
+    ports: 
+      - 9200:9200
+    environment:
+      - cluster.name=php_text_message-es-cluster
+      - node.name=php_text_message-es-master
+      # - discovery.seed_hosts=php_text_message-es-1, php_text_message-es-2
+      - cluster.initial_master_nodes=php_text_message-es-master
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # Xms: initial memory, Xmx: max memmory for heap in JVM
+      
+    ulimits:
+      memlock: # max locked-in-memory address space (KB)
+        soft: -1 # soft <= hard, -1 is unlimited
+        hard: -1 # maximum value for soft
+
+  php_text_message-kb:
+    ports:
+      - 5601:5601
+    env_file: 
+      - .env
+    # environment: 
+    #   ELASTICSEARCH_URL: http://php_text_message-es:9200 # master node url
+    #   ELASTICSEARCH_HOSTS: '["http://php_text_message-es:9200"]' # all host of node in cluster
+    deploy:
+      resources:
+        limits:
+          cpus: 0.50
+          memory: 2048M
+        reservations:
+          cpus: 0.25
+          memory: 500M

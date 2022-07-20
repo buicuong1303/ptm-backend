@@ -1,0 +1,79 @@
+version: '3.7'
+
+services:
+  php_text_message-backend:
+    networks:
+      - php_text_message-network
+    depends_on:
+      - php_text_message-database
+      - php_text_message-rabbitmq
+      - php_text_message-redis-queue
+      - php_text_message-es
+  
+  php_text_message-database:
+    container_name: php_text_message-database
+    hostname: php_text_message-database
+    image: postgres:12
+    networks:
+      - php_text_message-network
+    volumes:
+      - php_text_message-database-data:/var/lib/postgresql/data
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=logical"
+
+  php_text_message-redis-queue:
+    image: redis:alpine
+    container_name: php_text_message-redis-queue
+    hostname: php_text_message-redis-queue
+    volumes:
+      - php_text_message-redis-queue-data:/data
+    networks:
+      - php_text_message-network
+  
+  php_text_message-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: php_text_message-rabbitmq
+    hostname: php_text_message-rabbitmq
+    networks:
+      - php_text_message-network
+    volumes:
+      # - php_text_message-rabbitmq-data/etc:/var/etc/rabbitmq
+      # - php_text_message-rabbitmq-data/data:/var/lib/rabbitmq
+      # - php_text_message-rabbitmq-data/logs:/var/log/rabbitmq
+      - php_text_message-rabbitmq-data:/var/lib/rabbitmq
+
+  php_text_message-es:
+    image: php_text_message-es
+    build:
+      context: ./ #where Dockerfile to build
+      target: elasticsearch
+    container_name: php_text_message-es
+    hostname: php_text_message-es
+    volumes:
+      - php_text_message-es-data:/usr/share/elasticsearch/data
+    networks:
+      - php_text_message-network
+
+  php_text_message-kb:
+    image: docker.elastic.co/kibana/kibana:7.3.1
+    container_name: php_text_message-kb
+    networks:
+      - php_text_message-network
+    depends_on: 
+      - php_text_message-es
+
+networks:
+  php_text_message-network:
+    name: php_text_message-network
+
+volumes:
+  php_text_message-es-data:
+    name: php_text_message-es-data  # driver: local (default)
+  php_text_message-database-data:
+    name: php_text_message-database-data
+  php_text_message-redis-queue-data:
+    name: php_text_message-redis-queue-data
+  php_text_message-rabbitmq-data:
+    name: php_text_message-rabbitmq-data

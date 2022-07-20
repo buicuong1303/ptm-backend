@@ -1,0 +1,17 @@
+export enum HashTag {
+  GlIP_DATA = 'Glip data',
+  EPIC_DATA = 'Epic data',
+  PHONE_DATA = 'Phone data',
+  INBOUND_CALL_DATA = 'IC data',
+  EMAIL_DATA = 'Email data',
+  PUNCH_DATA = 'Punch data',
+  EMAIL_TEAM = 'Email team',
+  DEPARTMENT = 'Department',
+  AGENT = 'Agent',
+  CONFIG = 'Config',
+  DAILY_REPORT = 'Daily report',
+  WEEKLY_REPORT = 'Weekly report',
+  AGENT_REPORT = 'Agent report',
+  TEAM_CHAT_REPORT = 'Team chat',
+  IMPORT = 'Import',
+}
